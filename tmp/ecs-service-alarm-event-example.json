@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:236189869841:ecs-service-scaling:60299d52-7c2b-4c12-8956-f8d7be6442ec",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "fabef696-63f4-5bcb-9129-a063f60a56a7",
+        "TopicArn": "arn:aws:sns:us-east-1:236189869841:ecs-service-scaling",
+        "Subject": "ALARM: \"ecs-service-cpu-scaling-alarm\" in US East (N. Virginia)",
+        "Message": "{\"AlarmName\":\"ecs-service-cpu-scaling-alarm\",\"AlarmDescription\":\"Alarm triggered based on the CPU usage of the ECS service\",\"AWSAccountId\":\"236189869841\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 out of the last 1 datapoints [143.76304062822655 (25/03/20 17:19:00)] was greater than or equal to the threshold (10.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"StateChangeTime\":\"2020-03-25T17:24:14.298+0000\",\"Region\":\"US East (N. Virginia)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-1:236189869841:alarm:ecs-service-cpu-scaling-alarm\",\"OldStateValue\":\"OK\",\"Trigger\":{\"MetricName\":\"CPUUtilization\",\"Namespace\":\"AWS/ECS\",\"StatisticType\":\"Statistic\",\"Statistic\":\"MAXIMUM\",\"Unit\":null,\"Dimensions\":[{\"value\":\"web-nginx\",\"name\":\"ServiceName\"},{\"value\":\"ecs-scaling\",\"name\":\"ClusterName\"}],\"Period\":300,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":10.0,\"TreatMissingData\":\"- TreatMissingData:                    missing\",\"EvaluateLowSampleCountPercentile\":\"\"}}",
+        "Timestamp": "2020-03-25T17:24:14.348Z",
+        "SignatureVersion": "1",
+        "Signature": "FxvfpIumHKoP1ACFTXXt0l79vUAU3pFPb8/xYn2oXuATDpPEmSQflKQSnJROEbySakqvaEj7pdkbGrwZ2h026C9kX7JqYIpO141RUlBtZUpn7EFQiTlVRfajbzCbZ/cLvmOBUtXIXCzKLzUJg7IsPaWqdgmFjD7DcWq2okSyGeZcb8oF6S76oLfVajpJvOnDFF0MeWNj4LgkAPO9nmcOeAuzV7Mi663ueBd4QqcjtxAfTgd7DVgi6aCPvNHu5xmm24td9QzfHbz+t4afVSF7O8v3EyR2MfFUV53H2PbYzrcFfLcBKmYZW0Xru1xYqfn+0ABwScHUpPtN5wuOBfmjNg==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-a86cb10b4e1f29c941702d737128f7b6.pem",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:236189869841:ecs-service-scaling:60299d52-7c2b-4c12-8956-f8d7be6442ec",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}
