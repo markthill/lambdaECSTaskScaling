@@ -58,10 +58,12 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  scale_up:
-    handler: handler.scale_up
-  scale_down:
-    handler: handler.scale_down
+  scale_out:
+    handler: handler.scale_out
+  scale_in:
+    handler: handler.scale_in
+  reset_alarm:
+    handler: handler.reset_alarm
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

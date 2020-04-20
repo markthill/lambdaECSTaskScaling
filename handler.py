@@ -1,26 +1,59 @@
 import json
 import boto3
+import datetime
+import dynamodb
+import ecs
+import cloudwatch
+
 # import logging
 # logger = logging.getLogger()
 # logger.setLevel(logging.DEBUG)
 
 #from scaler import get_desired_count
 
+def reset_alarm(event, context):
+    print(event)
+    # Retrieve the alarm that we want to reset
+    now = datetime.datetime.now()
+    print(now.strftime("%Y-%m-%d %H:%M:%S"))
 
-def scale_up(event, context):
+    response = {
+        "statusCode": 200,
+        "body": "thanks: "
+    }
+
+    set_alarm_state('alarm-out', 'OK', 'Testing the resetting the state of the alarm')
+    return response
+
+def scale_out(event, context):
 
     print(event)
+    service = ecs.describe_service(event)
+    current_size = int(service['runningCount'])
+    new_size = dynamodb.scale_out_adjustment(event, current_size)
+
+    print("current size: %s" % (current_size))
+    print("adjusting to: %s" % (new_size))
+
+    if (current_size != new_size):
+        ecs.update_service(service, new_size)
+
+    cloudwatch.set_rule()
+
+    #service_dict = get_service_data_from_event(event)
 
     # retrieves the ClusterName and ServiceName
-    service_dict = get_service_data_from_event(event)
+
 
     # retrieve the actual values we need about the service.  The current state and the tags that describe min/max values.
-    service = describe_service(service_dict)
+    #service = describe_service(service_dict)
 
-    scale_up_response = scale_service_up(service)
+    ###scale_up_response = scale_service_out(service)
 
-    alarm_name = get_alarm_name(event)
-    set_alarm_state(alarm_name, 'OK', 'Resetting state to OK to allow for Alarm to trigger again.')
+    ###alarm_name = get_alarm_name(event)
+    #set_alarm_state(alarm_name, 'OK', 'Resetting state to OK to allow for Alarm to trigger again.')
+
+    ###set_rule('rule_name', 'cron')
 
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
@@ -32,10 +65,10 @@ def scale_up(event, context):
         "body": json.dumps(body)
     }
 
-    return scale_up_response
+    return response
 
 
-def scale_down(event, context):
+def scale_in(event, context):
 
     print(event)
 
@@ -45,10 +78,10 @@ def scale_down(event, context):
     # retrieve the actual values we need about the service.  The current state and the tags that describe min/max values.
     service = describe_service(service_dict)
 
-    scale_down_response = scale_service_down(service)
+    scale_down_response = scale_service_in(service)
 
     alarm_name = get_alarm_name(event)
-    set_alarm_state(alarm_name, 'OK', 'Resetting state to OK to allow for Alarm to trigger again.')
+    #set_alarm_state(alarm_name, 'OK', 'Resetting state to OK to allow for Alarm to trigger again.')
 
     response = {
         "statusCode": 200,
@@ -57,86 +90,87 @@ def scale_down(event, context):
 
     return scale_down_response
 
-def describe_service(dict):
-    client = boto3.client('ecs')
 
-    # describe the service based on the ClusterName and ServiceName keys from the dictionary
-    response = client.describe_services(
-        cluster=dict['ClusterName'],
-        include=['TAGS'],
-        services=[
-            dict['ServiceName']
-        ]
-    )
+# def describe_service(dict):
+#     client = boto3.client('ecs')
+#
+#     # describe the service based on the ClusterName and ServiceName keys from the dictionary
+#     response = client.describe_services(
+#         cluster=dict['ClusterName'],
+#         include=['TAGS'],
+#         services=[
+#             dict['ServiceName']
+#         ]
+#     )
+#
+#     print(response['services'][0])
+#
+#     # We are only interested in a single service, so there will only be one returned
+#     return response['services'][0]
 
-    print(response['services'][0])
+# def get_service_data_from_event(event):
+#     message = event['Records'][0]['Sns']['Message']
+#
+#     # The message from the event is in the format of JSON but it is actually a string so it has to be converted
+#     message_json = json.loads(message)
+#     dimensions = message_json['Trigger']['Dimensions']
+#
+#     # Create an empty dictionary to store the ClusterName and ServiceName
+#     dict = {}
+#
+#     for i in dimensions:
+#         dict[i['name']] = i['value']
+#
+#     return dict
+#
+# def get_alarm_name(event):
+#     message = event['Records'][0]['Sns']['Message']
+#     message_json = json.loads(message)
+#
+#     return message_json['AlarmName']
 
-    # We are only interested in a single service, so there will only be one returned
-    return response['services'][0]
-
-def get_service_data_from_event(event):
-    message = event['Records'][0]['Sns']['Message']
-
-    # The message from the event is in the format of JSON but it is actually a string so it has to be converted
-    message_json = json.loads(message)
-    dimensions = message_json['Trigger']['Dimensions']
-
-    # Create an empty dictionary to store the ClusterName and ServiceName
-    dict = {}
-
-    for i in dimensions:
-        dict[i['name']] = i['value']
-
-    return dict
-
-def get_alarm_name(event):
-    message = event['Records'][0]['Sns']['Message']
-    message_json = json.loads(message)
-
-    return message_json['AlarmName']
-
-def scale_service_up(service):
-    print('Scaling UP')
-
-    # Get the running, desired and pending.
-    running_count = service['runningCount']
-    desired_count = service['desiredCount']
-    pending_count = service['pendingCount']
-
-    maximum = get_maximum_service_size(service)
-
-    # TODO: need to possibly add the pending into this check
-    if running_count >= maximum:
-        print('Max service count reached.  No further scaling can be done.')
-        return "{'message': 'No scaling possible, max reached'}"
-    else:
-        print("Scaling up from %s to %s" % (str(running_count), str(running_count + 1)))
-        update_service(service, running_count + 1)
-
-def scale_service_down(service):
-    print('Scaling DOWN')
-
-    # Get the running, desired and pending.
-    running_count = service['runningCount']
-    desired_count = service['desiredCount']
-    pending_count = service['pendingCount']
-
-    minimum = get_minimum_service_size(service)
-
-    # TODO: need to possibly add the pending into this check
-    if running_count <= minimum:
-        print('Min service count reached.  No further scaling can be done.')
-        return "{'message': 'No scaling possible, min reached'}"
-    else:
-        print("Scaling down from %s to %s" % (str(running_count), str(running_count - 1)))
-        update_service(service, running_count - 1)
-
-# Returns the maximum size for the service.  This implementation may have to change if tags are not available on
-# container services
-def get_maximum_service_size(service):
-    tags = tags_dict(service)
-    maximum = tags['MaximumServiceSize']
-    return int(maximum)
+# def scale_service_out(service):
+#     print('Scaling UP')
+#
+#     # Get the running, desired and pending.
+#     running_count = service['runningCount']
+#     desired_count = service['desiredCount']
+#     pending_count = service['pendingCount']
+#
+#     maximum = get_maximum_service_size(service)
+#
+#     # TODO: need to possibly add the pending into this check
+#     if running_count >= maximum:
+#         print('Max service count reached.  No further scaling can be done.')
+#         return "{'message': 'No scaling possible, max reached'}"
+#     else:
+#         print("Scaling up from %s to %s" % (str(running_count), str(running_count + 1)))
+#         update_service(service, running_count + 1)
+#
+# def scale_service_in(service):
+#     print('Scaling DOWN')
+#
+#     # Get the running, desired and pending.
+#     running_count = service['runningCount']
+#     desired_count = service['desiredCount']
+#     pending_count = service['pendingCount']
+#
+#     minimum = get_minimum_service_size(service)
+#
+#     # TODO: need to possibly add the pending into this check
+#     if running_count <= minimum:
+#         print('Min service count reached.  No further scaling can be done.')
+#         return "{'message': 'No scaling possible, min reached'}"
+#     else:
+#         print("Scaling down from %s to %s" % (str(running_count), str(running_count - 1)))
+#         update_service(service, running_count - 1)
+#
+# # Returns the maximum size for the service.  This implementation may have to change if tags are not available on
+# # container services
+# def get_maximum_service_size(service):
+#     tags = tags_dict(service)
+#     maximum = tags['MaximumServiceSize']
+#     return int(maximum)
 
 # Returns the maximum size for the service.  This implementation may have to change if tags are not available on
 # container services
@@ -173,3 +207,6 @@ def set_alarm_state(alarm_name, state_value, state_reason):
          StateValue=state_value,
          StateReason=state_reason
      )
+
+
+

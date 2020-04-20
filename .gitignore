@@ -15,6 +15,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.idea
+__pycache__/
+.DS_Store
 
 # Serverless directories
 .serverless
