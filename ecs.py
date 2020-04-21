@@ -1,6 +1,7 @@
 import json
 import boto3
 
+
 # def service_current_size(dict):
 #     #service_dict = get_service_data_from_event(event)
 #     service = describe_service(dict)
@@ -22,7 +23,6 @@ def update_service(service_dict, desired_count):
 
 
 def describe_service(event):
-
     dict = get_service_data_from_event(event)
     client = boto3.client('ecs')
 
@@ -40,6 +40,7 @@ def describe_service(event):
     # We are only interested in a single service, so there will only be one returned
     return response['services'][0]
 
+
 def get_service_data_from_event(event):
     message = event['Records'][0]['Sns']['Message']
 
@@ -54,4 +55,3 @@ def get_service_data_from_event(event):
         dict[i['name']] = i['value']
 
     return dict
-

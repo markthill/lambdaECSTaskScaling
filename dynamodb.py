@@ -1,15 +1,45 @@
 import boto3
 import utils
 
-def scale_out_adjustment(event, current_count):
 
-    print("--------------")
+def scale_out_adjustment(event, item, current_count):
     print(event)
-    service_dict = utils.get_service_data_from_event(event)
-    cluster_name = service_dict['ClusterName']
-    service_name = service_dict['ServiceName']
-    service_id = "%s-%s-%s" % (cluster_name, service_name, "out")
-    print("dynamo_db.scale_out for service: %s" % (service_id))
+    adjustments_list = item['Item']['StepAdjustments']
+    max_service_count = item['Item']['MaximumServiceCount']
+    print("max service count: %s" % (max_service_count))
+
+    avg = utils.get_average_alarm_data_points(event)
+
+    adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
+
+    if (current_count + adjustment > max_service_count):
+        return max_service_count
+    else:
+        return int(current_count + adjustment)
+
+
+def scale_in_adjustment(event, item, current_count):
+    print(event)
+
+    adjustments_list = item['Item']['StepAdjustments']
+    min_service_count = item['Item']['MinimumServiceCount']
+    print("max service count: %s" % (min_service_count))
+
+    avg = utils.get_average_alarm_data_points(event)
+
+    adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
+
+    if (current_count + adjustment < min_service_count):
+        return min_service_count
+    else:
+        return int(current_count + adjustment)
+
+
+def get_item(event, direction):
+    print("Finding event for service: %s" % direction)
+    print(event)
+    service_id = utils.service_id(event, direction)
+    print("dynamo_db.get_item for service_id: %s" % (service_id))
 
     # Retrieve the scaling policy for the given cluster and service name
     dynamodb = boto3.resource('dynamodb')
@@ -19,18 +49,4 @@ def scale_out_adjustment(event, current_count):
         Key={"ServiceId": service_id}
     )
 
-    adjustments_list = response['Item']['StepAdjustments']
-    max_service_count = response['Item']['MaximumServiceCount']
-    print("max service count: %s" % (max_service_count))
-
-    avg = utils.get_average_alarm_data_points(event)
-
-    adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
-
-    if (current_count+adjustment > max_service_count):
-        return max_service_count
-    else:
-        return int(current_count+adjustment)
-
-def scale_in(event):
-    print("dynamo_db.scale_in")
+    return response

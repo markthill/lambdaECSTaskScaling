@@ -1,0 +1,13 @@
+{
+  "version": "0",
+  "id": "125a5bfe-1a5a-f9b5-da59-c923c85581e2",
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "account": "236189869841",
+  "time": "2020-04-21T18:56:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:events:us-east-1:236189869841:rule/ecs-scaling-web-nginx-in"
+  ],
+  "detail": {}
+}

@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:236189869841:lambdaecstaskscaling-dev-scale_down:71c80fb0-b9e2-4a64-8c22-8171a814034f",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "859535b7-5fdc-5d55-9640-62ae6e17f31e",
+        "TopicArn": "arn:aws:sns:us-east-1:236189869841:lambdaecstaskscaling-dev-scale_down",
+        "Subject": "ALARM: NginxServiceAlarmIn in US East (N. Virginia)",
+        "Message": "{\"AlarmName\":\"NginxServiceAlarmIn\",\"AlarmDescription\":\"Alarm covering nginx service for scaling in\",\"AWSAccountId\":\"236189869841\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 2 out of the last 2 datapoints [0.0 (21/04/20 17:36:00), 0.0 (21/04/20 17:35:00)] were less than the threshold (5.0) (minimum 2 datapoints for OK -> ALARM transition).\",\"StateChangeTime\":\"2020-04-21T17:38:19.617+0000\",\"Region\":\"US East (N. Virginia)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-1:236189869841:alarm:NginxServiceAlarmIn\",\"OldStateValue\":\"OK\",\"Trigger\":{\"MetricName\":\"CPUUtilization\",\"Namespace\":\"AWS/ECS\",\"StatisticType\":\"Statistic\",\"Statistic\":\"AVERAGE\",\"Unit\":null,\"Dimensions\":[{\"value\":\"web-nginx\",\"name\":\"ServiceName\"},{\"value\":\"ecs-scaling\",\"name\":\"ClusterName\"}],\"Period\":60,\"EvaluationPeriods\":2,\"ComparisonOperator\":\"LessThanThreshold\",\"Threshold\":5.0,\"TreatMissingData\":\"\",\"EvaluateLowSampleCountPercentile\":\"\"}}",
+        "Timestamp": "2020-04-21T17:38:19.665Z",
+        "SignatureVersion": "1",
+        "Signature": "ggfTyidD1EfR2iKLDa+UTPOffqSH8SgNC7e9zgHbWeW6TUNLXS16LZdlqO0XaSW15o6AbsQGvMjKi+GYKkVur/DwVriJ+/aOJU/CBQ6AltQdlxegaIQ4xb3A8evGSHHU4jLBi6MHeZU+n4+0s+UP31PTU1JrOe7tkztfBpl/f38ZIL6qJMD/Rua+4clkTMao3Lo0mY79yMDvCs5uAm8cYOGInR0v0zpP1c+THhLQapHy9Lp1wsz7GpE3wSP9A7pTKBO6tgBtSBUVW8Lb7K1C24UMLAvyc+pmzC0h6YEvLxzujvLQE1RFl8Nvzo+69YWAUMgFBi9VmB0SvfYmXb48Yw==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-a86cb10b4e1f29c941702d737128f7b6.pem",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:236189869841:lambdaecstaskscaling-dev-scale_down:71c80fb0-b9e2-4a64-8c22-8171a814034f",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}

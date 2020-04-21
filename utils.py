@@ -1,6 +1,7 @@
 import json
 import re
 
+
 def get_service_data_from_event(event):
     message = event['Records'][0]['Sns']['Message']
 
@@ -9,12 +10,13 @@ def get_service_data_from_event(event):
     dimensions = message_json['Trigger']['Dimensions']
 
     # Create an empty dictionary to store the ClusterName and ServiceName
-    dict = {}
+    service_dict = {}
 
     for i in dimensions:
-        dict[i['name']] = i['value']
+        service_dict[i['name']] = i['value']
 
-    return dict
+    return service_dict
+
 
 # The message from an alarm event will contain a NewStateReason that looks similar to the following
 # {"NewStateReason": "Threshold Crossed: 2 out of the last 2 datapoints [11.79340974842514 (20/04/20 16:15:00), 11.925176609329313 (20/04/20 16:14:00)] was greater than or equal to the threshold (10.0) (minimum 2 datapoint for OK -> ALARM transition)."
@@ -38,10 +40,10 @@ def get_average_alarm_data_points(event):
     x = 0
     total = 0
     for num in numeric_values:
-        x = x+1
+        x = x + 1
         total += num
 
-    avg = total/x
+    avg = total / x
     print(avg)
     return avg
 
@@ -71,6 +73,7 @@ def find_matching_step_adjustment(step_list, matching_value):
 
     return adjustment
 
+
 def create_cron_from_datetime(dt):
     print(dt.minute)
     print(dt.hour)
@@ -80,3 +83,11 @@ def create_cron_from_datetime(dt):
     print(dt.year)
     print("cron(%s %s %s %s ? %s)" % (dt.minute, dt.hour, dt.day, dt.month, dt.year))
     return "cron(%s %s %s %s ? %s)" % (dt.minute, dt.hour, dt.day, dt.month, dt.year)
+
+
+def service_id(event, direction):
+    service_dict = get_service_data_from_event(event)
+    cluster_name = service_dict['ClusterName']
+    service_name = service_dict['ServiceName']
+    service_id = "%s-%s-%s" % (cluster_name, service_name, direction)
+    return service_id
