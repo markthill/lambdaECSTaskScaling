@@ -13,7 +13,7 @@ def scale_out_adjustment(event, item, current_count):
     adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
 
     if (current_count + adjustment > max_service_count):
-        return max_service_count
+        return int(max_service_count)
     else:
         return int(current_count + adjustment)
 
@@ -30,7 +30,7 @@ def scale_in_adjustment(event, item, current_count):
     adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
 
     if (current_count + adjustment < min_service_count):
-        return min_service_count
+        return int(min_service_count)
     else:
         return int(current_count + adjustment)
 

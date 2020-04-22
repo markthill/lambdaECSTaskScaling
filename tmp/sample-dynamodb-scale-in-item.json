@@ -1,0 +1,23 @@
+{
+  "AdjustmentType": "ChangeInCapacity",
+  "Cooldown": 5,
+  "MetricAggregationType": "Average",
+  "MinimumServiceCount": 1,
+  "ServiceId": "ecs-scaling-web-nginx-in",
+  "StepAdjustments": [
+    {
+      "MetricIntervalLowerBound": -10,
+      "MetricIntervalUpperBound": 0,
+      "ScalingAdjustment": -1
+    },
+    {
+      "MetricIntervalLowerBound": -20,
+      "MetricIntervalUpperBound": -10,
+      "ScalingAdjustment": -2
+    },
+    {
+      "MetricIntervalUpperBound": -20,
+      "ScalingAdjustment": -3
+    }
+  ]
+}

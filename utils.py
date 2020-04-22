@@ -1,7 +1,8 @@
 import json
 import re
 
-
+# Takes the event sent from an SNS message and parses it to return the service data that we are interested in
+# for scaling purposes.
 def get_service_data_from_event(event):
     message = event['Records'][0]['Sns']['Message']
 
@@ -49,23 +50,28 @@ def get_average_alarm_data_points(event):
 
 
 def find_matching_step_adjustment(step_list, matching_value):
-    print(step_list)
+    print("Finding a match in steps for value: %s" % matching_value)
+
+    # Cycle through all the step adjustments until one is found matching the passed in "matching_value".  Once
+    # the correct upper and lower bound match return the adjustment
     for step in step_list:
         print(step)
+        # Find the upper bound of the step
         if 'MetricIntervalUpperBound' in step:
             upper_bound = step['MetricIntervalUpperBound']
-            print(upper_bound)
         else:
             # Set an arbitrarily high upper bound
             upper_bound = 10000
 
+        # Find the lower bound of the step
         if 'MetricIntervalLowerBound' in step:
             lower_bound = step['MetricIntervalLowerBound']
-            print(upper_bound)
         else:
             # Set 0 lower bound
             lower_bound = 0
 
+        # See if the value being matched against is in between the upper and lower bound.  If it is return the
+        # ScalingAdjustment for that step
         if (matching_value >= lower_bound and matching_value <= upper_bound):
             adjustment = step['ScalingAdjustment']
             print("match for adjustment of: %s" % (adjustment))
@@ -75,13 +81,7 @@ def find_matching_step_adjustment(step_list, matching_value):
 
 
 def create_cron_from_datetime(dt):
-    print(dt.minute)
-    print(dt.hour)
-    print(dt.day)
-    print(dt.month)
-    print('?')
-    print(dt.year)
-    print("cron(%s %s %s %s ? %s)" % (dt.minute, dt.hour, dt.day, dt.month, dt.year))
+    print("returning cron formatted to: cron(%s %s %s %s ? %s)" % (dt.minute, dt.hour, dt.day, dt.month, dt.year))
     return "cron(%s %s %s %s ? %s)" % (dt.minute, dt.hour, dt.day, dt.month, dt.year)
 
 

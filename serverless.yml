@@ -29,41 +29,73 @@ provider:
 #  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "cloudwatch:*"
+        - "dynamodb:*"
+        - "sns:*"
+        - "logs:*"
+        - "ecs:*"
+        - "events:*"
+      Resource: "*"
 
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
+package:
+  exclude:
+    - README.md
+    - tmp/**
 
 functions:
   scale_out:
     handler: handler.scale_out
+    events:
+      - sns:
+          arn: !Ref EcsServiceScaleOutTopic
+          topicName: ecs-service-scaling-out-topic
   scale_in:
     handler: handler.scale_in
+    events:
+      - sns:
+          arn: !Ref EcsServiceScaleInTopic
+          topicName: ecs-service-scaling-in-topic
   reset_alarm:
     handler: handler.reset_alarm
+
+# AWS CloudFormation Resources
+resources:
+  Resources:
+    EcsServiceScaleOutTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ecs-service-scaling-out-topic
+    EcsServiceScaleInTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ecs-service-scaling-in-topic
+  Outputs:
+    EcsServiceScaleOutTopic:
+      Description: "Scale out topic output"
+      Value:
+        Ref: EcsServiceScaleOutTopic
+      Export:
+        Name: ${self:service}:scale-out-sns
+    EcsServiceScaleInTopic:
+      Description: "Scale in topic output"
+      Value:
+        Ref: EcsServiceScaleInTopic
+      Export:
+        Name: ${self:service}:scale-in-sns
+
+
+#Fn::ImportValue: {
+#Fn::Sub: "${NetworkStackName}-SecurityGroupID"
+#}
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -104,14 +136,3 @@ functions:
 #    environment:
 #      variable2: value2
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
