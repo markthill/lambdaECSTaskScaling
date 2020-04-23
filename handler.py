@@ -6,7 +6,8 @@ import dynamodb
 import ecs
 import utils
 
-
+# TODO: Using this logger adds a lot of detail that can make it hard to sift through issues so for now print
+# statements are still being used throughout
 # import logging
 # logger = logging.getLogger()
 # logger.setLevel(logging.DEBUG)
@@ -19,6 +20,7 @@ def reset_alarm(event, context):
     print("reset_alarm called on: %s" % now_formatted)
     cloudwatch.set_alarm_state(alarm_name, "OK", "Resetting for Autoscaling purposes")
 
+    # TODO: work on more appropriate and informative responses
     response = {
         "statusCode": 200,
         "body": "thanks: "
@@ -50,11 +52,11 @@ def scale_out(event, context):
         "input": event
     }
 
+    # TODO: work on more appropriate and informative responses
     response = {
         "statusCode": 200,
         "body": json.dumps(body)
     }
-
     return response
 
 
@@ -81,9 +83,9 @@ def scale_in(event, context):
         "input": event
     }
 
+    # TODO: work on more appropriate and informative responses
     response = {
         "statusCode": 200,
         "body": json.dumps(body)
     }
-
     return response

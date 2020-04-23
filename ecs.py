@@ -1,16 +1,6 @@
 import json
 import boto3
 
-
-# def service_current_size(dict):
-#     #service_dict = get_service_data_from_event(event)
-#     service = describe_service(dict)
-#     return service['runningCount']
-#     # Get the running, desired and pending.
-#     # running_count = service['runningCount']
-#     # desired_count = service['desiredCount']
-#     # pending_count = service['pendingCount']
-
 def update_service(service_dict, desired_count):
     print("update service: %s" % (desired_count))
     client = boto3.client('ecs')
