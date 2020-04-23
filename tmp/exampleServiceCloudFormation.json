@@ -1,0 +1,105 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "The AWS CloudFormation template for this ECS service",
+    "Resources": {
+        "NginxService": {
+            "Type" : "AWS::ECS::Service",
+            "Properties" : {
+                "Cluster": "ecs-scaling",
+                "ServiceName": "web-nginx",
+                "TaskDefinition": "arn:aws:ecs:us-east-1:236189869841:task-definition/web-nginx:7",
+                "DesiredCount": 1
+            }
+        },
+        "NginxServiceAlarmOut": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "AlarmDescription": "Alarm covering nginx service for scaling out",
+                "AlarmName": "ecs-scaling-web-nginx-out",
+                "AlarmActions": [
+                    {
+                        "Fn::ImportValue": "lambdaecstaskscaling:scale-out-sns"
+                    }
+                ],
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "DatapointsToAlarm": 2,
+                "Dimensions": [
+                    {
+                        "Name": "ClusterName",
+                        "Value": "ecs-scaling"
+                    },
+                    {
+                        "Name": "ServiceName",
+                        "Value": "web-nginx"
+                    }
+                ],
+                "EvaluationPeriods": 2,
+                "Namespace": "AWS/ECS",
+                "MetricName": "CPUUtilization",
+                "Period": 60,
+                "Statistic": "Average",
+                "Threshold": 5
+            }
+        },
+        "NginxServiceAlarmIn": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "AlarmDescription": "Alarm covering nginx service for scaling in",
+                "AlarmName": "ecs-scaling-web-nginx-in",
+                "AlarmActions": [
+                    {
+                        "Fn::ImportValue": "lambdaecstaskscaling:scale-in-sns"
+                    }
+                ],
+                "ComparisonOperator": "LessThanThreshold",
+                "DatapointsToAlarm": 2,
+                "Dimensions": [
+                    {
+                        "Name": "ClusterName",
+                        "Value": "ecs-scaling"
+                    },
+                    {
+                        "Name": "ServiceName",
+                        "Value": "web-nginx"
+                    }
+                ],
+                "EvaluationPeriods": 2,
+                "Namespace": "AWS/ECS",
+                "MetricName": "CPUUtilization",
+                "Period": 60,
+                "Statistic": "Average",
+                "Threshold": 5
+            }
+        },
+        "NginxServiceRuleOut": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+                "Name": "ecs-scaling-web-nginx-out",
+                "Description": "The Event Rule which resets the Nginx Service Alarm Out",
+                "ScheduleExpression": "cron(22 16 20 4 ? 2020)",
+                "State": "ENABLED",
+                "Targets": [
+                    {
+                        "Arn": "arn:aws:lambda:us-east-1:236189869841:function:lambdaecstaskscaling-dev-reset_alarm",
+                        "Id": "TargetResetAlarm"
+                    }
+                ]
+            }
+        },
+        "NginxServiceRuleIn": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+                "Name": "ecs-scaling-web-nginx-in",
+                "Description": "The Event Rule which resets the Nginx Service Alarm In",
+                "ScheduleExpression": "cron(22 16 20 4 ? 2020)",
+                "State": "ENABLED",
+                "Targets": [
+                    {
+                        "Arn": "arn:aws:lambda:us-east-1:236189869841:function:lambdaecstaskscaling-dev-reset_alarm",
+                        "Id": "TargetResetAlarm"
+                    }
+                ]
+            }
+        }
+    }
+}
