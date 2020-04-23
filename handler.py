@@ -87,29 +87,3 @@ def scale_in(event, context):
     }
 
     return response
-
-# # Returns the maximum size for the service.  This implementation may have to change if tags are not available on
-# # container services
-# def get_minimum_service_size(service):
-#     tags = tags_dict(service)
-#     minimum = tags['MinimumServiceSize']
-#     return int(minimum)
-#
-# def tags_dict(service):
-#     service_tags = service['tags']
-#
-#     tags_dict = {}
-#
-#     for tag in service_tags:
-#         tags_dict[tag['key']] = tag['value']
-#
-#     return tags_dict
-#
-# def update_service(service, desired_count):
-#     client = boto3.client('ecs')
-#
-#     client.update_service(
-#         cluster=service['clusterArn'],
-#         service=service['serviceName'],
-#         desiredCount=desired_count
-#     )
