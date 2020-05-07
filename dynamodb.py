@@ -9,8 +9,12 @@ def scale_out_adjustment(event, item, current_count):
     print("max service count: %s" % (max_service_count))
 
     avg = utils.get_average_alarm_data_points(event)
+    threshold = utils.get_threshold(event)
 
-    adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
+    bound_adjustment = avg - threshold
+    print("bound adjustment: %s" % (bound_adjustment))
+
+    adjustment = utils.find_matching_step_adjustment(adjustments_list, bound_adjustment)
 
     if (current_count + adjustment > max_service_count):
         return int(max_service_count)
@@ -23,11 +27,15 @@ def scale_in_adjustment(event, item, current_count):
 
     adjustments_list = item['Item']['StepAdjustments']
     min_service_count = item['Item']['MinimumServiceCount']
-    print("max service count: %s" % (min_service_count))
+    print("min service count: %s" % (min_service_count))
 
     avg = utils.get_average_alarm_data_points(event)
+    threshold = utils.get_threshold(event)
 
-    adjustment = utils.find_matching_step_adjustment(adjustments_list, avg)
+    bound_adjustment = avg - threshold
+    print("bound adjustment: %s" % (bound_adjustment))
+
+    adjustment = utils.find_matching_step_adjustment(adjustments_list, bound_adjustment)
 
     if (current_count + adjustment < min_service_count):
         return int(min_service_count)

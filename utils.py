@@ -45,8 +45,21 @@ def get_average_alarm_data_points(event):
         total += num
 
     avg = total / x
-    print(avg)
+    print("The average of the data points are %s" % (avg))
     return avg
+
+def get_threshold(event):
+    message = event['Records'][0]['Sns']['Message']
+    message_json = json.loads(message)
+
+    new_state_reason = message_json['NewStateReason']
+    threshold = re.finditer(r'(?<= (threshold \()).+?(?=\))', new_state_reason)
+
+    for item in threshold:
+        threshold_value = item.group(0)
+    print("found threshold of: %s" % threshold_value)
+
+    return float(threshold_value)
 
 
 def find_matching_step_adjustment(step_list, matching_value):
@@ -72,10 +85,13 @@ def find_matching_step_adjustment(step_list, matching_value):
 
         # See if the value being matched against is in between the upper and lower bound.  If it is return the
         # ScalingAdjustment for that step
+        adjustment = 0
         if (matching_value >= lower_bound and matching_value <= upper_bound):
             adjustment = step['ScalingAdjustment']
             print("match for adjustment of: %s" % (adjustment))
             break
+        else:
+            print("no match found with upper bound: %s and lower bound: %s" % (upper_bound, lower_bound))
 
     return adjustment
 

@@ -6,10 +6,11 @@ import datetime
 def set_rule(rule_name, cooldown):
     now = datetime.datetime.utcnow()
     now_plus_cool_down = now + datetime.timedelta(minutes=cooldown)
+    print("setting rule with time: %s" % (now_plus_cool_down))
     cron = utils.create_cron_from_datetime(now_plus_cool_down)
 
     client = boto3.client('events')
-    description = "this is just a test update from Lambda with cron: %s" % (cron)
+    description = "Lambda ECS scaling set cron as: %s or time: %s" % (cron, now_plus_cool_down)
     client.put_rule(
         Name=rule_name,
         ScheduleExpression=cron,
